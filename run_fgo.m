@@ -1,7 +1,19 @@
 %% Run factor graph optimization for smartphone's GNSS and IMU integration
 % Author Taro Suzuki
-clear; close all; clc;
+clear classes; clear; close all; clc;
 addpath ./functions/
+
+P = py.sys.path;
+modpath = "/home/rtk/Desktop/works/MatRTKLIB/+rtklib/";
+if count(P,modpath) == 0
+	insert(P,int32(0),modpath);
+end
+modpath = "/home/rtk/.local/lib/python3.8/site-packages";
+if count(P,modpath) == 0
+	insert(P,int32(0),modpath);
+end
+mod = py.importlib.import_module('rtkcmn');
+py.importlib.reload(mod);
 
 %% Setting
 % Initialization flag for position estimation.
@@ -29,21 +41,6 @@ parfor i=1:n
     % Trip path
     setting = settings(i,:);
     trippath = datapath+setting.Course+"/"+setting.Phone+"/";
-
-    %% FGO using GNSS only (first position/velocity estimation)
-    % The results are saved in result_gnss.mat.
-    if initflag
-        fgo_gnss(datapath, setting, true);
-    end
-
-    %% FGO using GNSS+IMU (first attitude estimation)
-    % The results are saved in result_gnss_imu.mat.
-    if initflag
-        if ~exist(trippath+"/result_gnss.mat", "file")
-            error("Please execute fgo_gnss(datapath, setting, true) first!")
-        end
-        fgo_gnss_imu(datapath, setting, true);
-    end
 
     %% FGO using GNSS+IMU (final estimation)
     % Estimate a more accurate position using the previous estimated result

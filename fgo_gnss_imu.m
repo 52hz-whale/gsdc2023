@@ -73,7 +73,7 @@ obsr = obsr.residuals(satr);
 % ECEF to ENU
 for j=1:nsat
     exyz = [-satr.ex(:,j) -satr.ey(:,j) -satr.ez(:,j)]; % Line-of-sight vector in ECEF
-    eenu = rtklib.ecef2enu(exyz, posini.orgllh); % Line-of-sight vector in ENU
+    eenu = double(py.rtkcmn.ecef2enu(py.numpy.array(exyz), py.numpy.array(posini.orgllh))); % Line-of-sight vector in ENU
     ee(:,j) = eenu(:,1);
     en(:,j) = eenu(:,2);
     eu(:,j) = eenu(:,3);

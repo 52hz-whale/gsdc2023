@@ -12,8 +12,10 @@ modpath = "/home/rtk/.local/lib/python3.8/site-packages";
 if count(P,modpath) == 0
 	insert(P,int32(0),modpath);
 end
-mod = py.importlib.import_module('rtkcmn');
-py.importlib.reload(mod);
+mod0 = py.importlib.import_module('rtkcmn');
+py.importlib.reload(mod0);
+mod1 = py.importlib.import_module('ephemeris');
+py.importlib.reload(mod1);
 
 %% Setting
 % Initialization flag for position estimation.
@@ -37,7 +39,7 @@ optStat = repmat(struct("OptTime",NaN,"OptIter",NaN,"OptError",NaN,"Score",NaN),
 %% Run FGO
 tic;
 % Use parfor to speed up. The figure will not be displayed
-parfor i=1:n
+for i=1:n
     % Trip path
     setting = settings(i,:);
     trippath = datapath+setting.Course+"/"+setting.Phone+"/";

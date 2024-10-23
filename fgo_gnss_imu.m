@@ -19,11 +19,11 @@ fprintf('Course: %s, Phone: %s\n', course, phone);
 % Load preprocessed smartphone data
 load(datapath+course+"/"+phone+"/"+"phone_data.mat");
 
-% Load if the reference height is available
-if exist(datapath+course+"/ref_hight.mat", "file")
-    load(datapath+course+"/ref_hight.mat");
-    posgt.setOrg(posbl.orgllh, 'llh'); % Set orgin and convert to ENU
-end
+% % Load if the reference height is available
+% if exist(datapath+course+"/ref_hight.mat", "file")
+%     load(datapath+course+"/ref_hight.mat");
+%     posgt.setOrg(posbl.orgllh, 'llh'); % Set orgin and convert to ENU
+% end
 
 %% Setting
 is = setting.IdxStart; % Start index for optimization
@@ -35,27 +35,11 @@ FTYPE = ["L1","L5"];   % Frequency type
 prm = parameters(setting, initflag); % Processing parameter
 
 %% Initial position/velocity/clk/dclk/rpy
-if initflag
-    % If this is the first run of fgo_gnss_imu, set the output of fgo_gnss to the initial value
-    load(datapath+course+"/"+phone+"/"+"result_gnss.mat");
-    posini = posest.copy();
-    velini = velest.copy();
-    clk = clkest;
-    dclk = dclkest;
-    rpy = vel2rpy(velini.enu, prm); % Estimate attitude from velocity
-else
-    % If this is not the first run, the previous estimate is used as the initial value
-    load(datapath+course+"/"+phone+"/"+"result_gnss_imu.mat");
-    posini = posest.copy();
-    velini = velest.copy();
-    clk = clkest;
-    dclk = dclkest;
-    if setting.RPYReset % Initial attitude reset flag
-        rpy = vel2rpy(velini.enu, prm); % Estimate attitude from velocity
-    else
-        rpy = rpyest;
-    end
-end
+posini = posbl.copy();
+velini = posbl.gradient(obs.dt);
+clk = [obs.clk zeros(n,6)];
+dclk = obs.dclk;
+rpy = vel2rpy(velini.enu, prm);
 
 %% Compute residuals
 % Exclude outliers

@@ -18,6 +18,8 @@ fprintf('Course: %s, Phone: %s\n', course, phone);
 
 % Load preprocessed smartphone data
 load(datapath+course+"/"+phone+"/"+"phone_data.mat");
+nav_py = nav.struct;
+save('nav.mat', 'nav_py');
 
 % Load if the reference height is available
 if exist(datapath+course+"/ref_hight.mat", "file")

@@ -18,8 +18,9 @@ fprintf('Course: %s, Phone: %s\n', course, phone);
 
 % Load preprocessed smartphone data
 load(datapath+course+"/"+phone+"/"+"phone_data.mat");
-nav_py = nav.struct;
-save('nav.mat', 'nav_py');
+nav_py = nav.struct; save('nav.mat', 'nav_py');
+obs_py = obs.struct; save('obs.mat', 'obs_py');
+obsb_py = obsb.struct; save('obsb.mat', 'obsb_py');
 
 % Load if the reference height is available
 if exist(datapath+course+"/ref_hight.mat", "file")
@@ -62,6 +63,7 @@ end
 %% Compute residuals
 % Exclude outliers
 obsr = exobs(obs, prm);
+obsr_py = obsr.struct; save('obsr.mat', 'obsr_py');
 
 % Observation residuals
 satr = gt.Gsat(obsr, nav);

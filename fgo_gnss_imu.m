@@ -68,6 +68,10 @@ obsr_py = obsr.struct; save('obsr.mat', 'obsr_py');
 % Observation residuals
 satr = gt.Gsat(obsr, nav);
 satr.setRcvPosVel(posini, velini);
+posini_py = posini.struct; save('posini.mat', 'posini_py');
+velini_py = velini.struct; save('velini.mat', 'velini_py');
+satr_py = satr.struct; save('satr.mat', 'satr_py');
+
 obsr = obsr.residuals(satr);
 
 % Exclude outliers from residuals

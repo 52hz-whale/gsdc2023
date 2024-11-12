@@ -18,6 +18,7 @@ posbase = gt.Gpos(mean(basepos{idx,3:5}, 1, "omitmissing"),'xyz');
 satb = gt.Gsat(obsb, nav);
 satb.setRcvPosVel(posbase, gt.Gvel([0 0 0], 'xyz'));
 obsb = obsb.residuals(satb);
+new_obsb_py = obsb.struct; save('new_obsb.mat', 'new_obsb_py');
 
 % Add antenna reference position offset
 offset = baseoffset{baseoffset.Base==prm.Base, 2:4};

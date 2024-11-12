@@ -63,5 +63,53 @@ classdef GobsPhone < gt.Gobs
                 end
             end
         end
+
+        function obsstr = mystruct(obj, tidx, sidx)
+            arguments
+                obj GobsPhone
+                tidx {mustBeInteger, mustBeVector} = 1:obj.n
+                sidx {mustBeInteger, mustBeVector} = 1:obj.nsat
+            end
+            obsstr.clk = obj.clk;
+            obsstr.dclk = obj.dclk;
+            obsstr.clkjump = obj.clkjump;
+            obsstr.hcdc = obj.hcdc;
+            obsstr.timems = obj.timems;
+            obsstr.utcms = obj.utcms;
+            obsstr.elapsedns = obj.elapsedns;
+
+            obsstr.sat = obj.sat;
+            obsstr.prn = obj.prn;
+            obsstr.sys = double(obj.sys);
+            obsstr.ep = obj.time.ep;
+            obsstr.tow = obj.time.tow;
+            obsstr.week = obj.time.week;
+            obsstr.n = size(obsstr.ep,1);
+            obsstr.nsat = size(obsstr.sat,2);
+            for f = obj.FTYPE
+                if ~isempty(obj.(f))
+                    obsstr.(f) = obj.myselectFreqStruct(obj.(f), tidx, sidx);
+                end
+            end
+        end
+
+        function Fsel = myselectFreqStruct(obj,F,tidx,sidx)
+            if isfield(F,"P"); Fsel.P = F.P(tidx,sidx); end
+            if isfield(F,"L"); Fsel.L = F.L(tidx,sidx); end
+            if isfield(F,"D"); Fsel.D = F.D(tidx,sidx); end
+            if isfield(F,"S"); Fsel.S = F.S(tidx,sidx); end
+            if isfield(F,"I"); Fsel.I = F.I(tidx,sidx); end
+            if isfield(F,'ctype'); Fsel.ctype = F.ctype(sidx);end
+            if isfield(F,'freq'); Fsel.freq = F.freq(sidx);end
+            if isfield(F,'lam'); Fsel.lam = F.lam(sidx); end
+            if isfield(F,"multipath"); Fsel.multipath = F.multipath(tidx,sidx); end
+            if isfield(F,"Pstat"); Fsel.Pstat = F.Pstat(tidx,sidx); end
+            if isfield(F,"Lstat"); Fsel.Lstat = F.Lstat(tidx,sidx); end
+            if isfield(F,"resP"); Fsel.resP = F.resP(tidx,sidx); end
+            if isfield(F,"resL"); Fsel.resL = F.resL(tidx,sidx); end
+            if isfield(F,"resD"); Fsel.resD = F.resD(tidx,sidx); end
+            if isfield(F,"resPc"); Fsel.resPc = F.resPc(tidx,sidx); end
+            if isfield(F,"resLc"); Fsel.resLc = F.resLc(tidx,sidx); end
+        end
     end
 end

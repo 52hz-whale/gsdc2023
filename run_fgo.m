@@ -40,6 +40,7 @@ optStat = repmat(struct("OptTime",NaN,"OptIter",NaN,"OptError",NaN,"Score",NaN),
 tic;
 % Use parfor to speed up. The figure will not be displayed
 for i=1:n
+    disp(i);
     % Trip path
     setting = settings(i,:);
     trippath = datapath+setting.Course+"/"+setting.Phone+"/";

@@ -18,9 +18,6 @@ fprintf('Course: %s, Phone: %s\n', course, phone);
 
 % Load preprocessed smartphone data
 load(datapath+course+"/"+phone+"/"+"phone_data.mat");
-nav_py = nav.struct; save('nav.mat', 'nav_py');
-obs_py = obs.struct; save('obs.mat', 'obs_py');
-obsb_py = obsb.struct; save('obsb.mat', 'obsb_py');
 
 % Load if the reference height is available
 if exist(datapath+course+"/ref_hight.mat", "file")
@@ -38,39 +35,34 @@ FTYPE = ["L1","L5"];   % Frequency type
 prm = parameters(setting, initflag); % Processing parameter
 
 %% Initial position/velocity/clk/dclk/rpy
-if initflag
-    % If this is the first run of fgo_gnss_imu, set the output of fgo_gnss to the initial value
-    load(datapath+course+"/"+phone+"/"+"result_gnss.mat");
-    posini = posest.copy();
-    velini = velest.copy();
-    clk = clkest;
-    dclk = dclkest;
+% If this is not the first run, the previous estimate is used as the initial value
+load(datapath+course+"/"+phone+"/"+"result_gnss_imu.mat");
+posini = posest.copy();
+velini = velest.copy();
+clk = clkest;
+dclk = dclkest;
+if setting.RPYReset % Initial attitude reset flag
     rpy = vel2rpy(velini.enu, prm); % Estimate attitude from velocity
 else
-    % If this is not the first run, the previous estimate is used as the initial value
-    load(datapath+course+"/"+phone+"/"+"result_gnss_imu.mat");
-    posini = posest.copy();
-    velini = velest.copy();
-    clk = clkest;
-    dclk = dclkest;
-    if setting.RPYReset % Initial attitude reset flag
-        rpy = vel2rpy(velini.enu, prm); % Estimate attitude from velocity
-    else
-        rpy = rpyest;
-    end
+    rpy = rpyest;
 end
+
+% save all raw data for python
+nav_py = nav.struct; save('nav.mat', 'nav_py');
+obs_py = obs.mystruct; save('obs.mat', 'obs_py');
+obsb_py = obsb.struct; save('obsb.mat', 'obsb_py');
+posini_py = posini.struct; save('posini.mat', 'posini_py');
+velini_py = velini.struct; save('velini.mat', 'velini_py');
+save('clk.mat', 'clk');
+save('dclk.mat', 'dclk');
 
 %% Compute residuals
 % Exclude outliers
 obsr = exobs(obs, prm);
-obsr_py = obsr.struct; save('obsr.mat', 'obsr_py');
 
 % Observation residuals
 satr = gt.Gsat(obsr, nav);
 satr.setRcvPosVel(posini, velini);
-posini_py = posini.struct; save('posini.mat', 'posini_py');
-velini_py = velini.struct; save('velini.mat', 'velini_py');
-satr_py = satr.struct; save('satr.mat', 'satr_py');
 
 obsr = obsr.residuals(satr);
 
@@ -98,6 +90,10 @@ end
 
 %% Observation error model
 obserr = obserrmodel(obsr,satr,prm);
+
+new_satr_py = satr.struct; save('new_satr.mat', 'new_satr_py');
+new_obsr_py = obsr.struct; save('new_obsr.mat', 'new_obsr_py');
+new_obserr_py = [obserr.L1.P, obserr.L1.D, obserr.L1.L, obserr.L5.P, obserr.L5.D, obserr.L5.L]; save('new_obserr.mat', 'new_obserr_py');
 
 %% Parameters for graph optimization
 noise_sigmas = @gtsam.noiseModel.Diagonal.Sigmas;
